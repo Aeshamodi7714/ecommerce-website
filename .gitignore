@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+ecommerce-frontend/node_modules/
+temp-backend/node_modules/
+
+# Production
+dist/
+ecommerce-frontend/dist/
+
+# Env
+.env
+ecommerce-frontend/.env
+temp-backend/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
