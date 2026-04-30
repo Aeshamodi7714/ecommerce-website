@@ -1,15 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../services/api/axiosInstance';
 
-const initialState = {
-  items: JSON.parse(localStorage.getItem('cart')) || [],
-  totalAmount: 0,
-  loading: false,
-  error: null,
-};
-
 const calculateTotal = (items) => {
   return items.reduce((total, item) => total + item.price * item.quantity, 0);
+};
+
+const initialItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+const initialState = {
+  items: initialItems,
+  totalAmount: calculateTotal(initialItems),
+  loading: false,
+  error: null,
 };
 
 export const fetchCart = createAsyncThunk('cart/fetch', async (_, { rejectWithValue }) => {
