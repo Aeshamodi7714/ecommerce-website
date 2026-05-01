@@ -58,8 +58,8 @@ function App() {
             <Route index element={<Home />} />
             <Route path="products" element={<ProductList />} />
             <Route path="products/:id" element={<ProductDetail />} />
-            <Route path="cart" element={<Cart />} />
-            <Route path="wishlist" element={<Wishlist />} />
+            <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
             <Route path="about" element={<About />} />
             <Route path="faq" element={<FAQ />} />
             <Route path="contact" element={<Contact />} />

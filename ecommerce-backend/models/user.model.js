@@ -26,6 +26,10 @@ let userSchema = mongoose.Schema({
     enum: ["user", "admin", "manager"],
     default: "user",
   },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // jwt token

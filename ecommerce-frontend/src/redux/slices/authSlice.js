@@ -27,7 +27,7 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
         username: 'Super Admin', 
         email: 'admin@hub.com', 
         role: 'admin', 
-        _id: 'unique_admin_key_1414' 
+        _id: '65f1a2b3c4d5e6f7a8b9c0d0' 
       };
       const token = 'admin-auth-token-bypass';
       localStorage.setItem('user', JSON.stringify(adminUser));

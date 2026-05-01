@@ -22,3 +22,12 @@ module.exports.updateUserRole = async ({ userId, role }) => {
     { new: true },
   );
 };
+
+// toggle block status
+module.exports.toggleBlockUser = async (id) => {
+  const user = await userModel.findById(id);
+  if (!user) return null;
+  user.isBlocked = !user.isBlocked;
+  await user.save();
+  return user;
+};

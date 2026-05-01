@@ -7,7 +7,7 @@ module.exports.createProduct = async ({
   stock,
   price,
   discount,
-  isNewProduct,
+  isNewproduct,
   sku,
   images,
   brand,
@@ -23,7 +23,7 @@ module.exports.createProduct = async ({
     !brand ||
     !category
   ) {
-    throw new Error("All Feild Are Required !!");
+    throw new Error("All Fields Are Required !!");
   }
 
   let product = await productModel.create({
@@ -32,7 +32,7 @@ module.exports.createProduct = async ({
     stock,
     price,
     discount,
-    isNewProduct,
+    isNewproduct,
     sku,
     images,
     brand,
@@ -45,7 +45,6 @@ module.exports.createProduct = async ({
 // get single product
 module.exports.singleProduct = async (id) => {
   const product = await productModel.findOne({ _id: id });
-
   return product;
 };
 
@@ -92,7 +91,7 @@ module.exports.updateProduct = async ({
   stock,
   price,
   discount,
-  isNewProduct,
+  isNewproduct,
   sku,
   images,
   brand,
@@ -106,7 +105,7 @@ module.exports.updateProduct = async ({
       stock,
       price,
       discount,
-      isNewProduct,
+      isNewproduct,
       sku,
       images,
       brand,

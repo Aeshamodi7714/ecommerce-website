@@ -3,19 +3,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import { addToCart } from '../../redux/slices/cartSlice';
 import { Filter, ShoppingCart, Heart, Search, ChevronDown, LayoutGrid, List, Star, ArrowRight } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const ProductList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { items: products, loading } = useSelector((state) => state.products);
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const [viewMode, setViewMode] = useState('grid');
   
   const category = searchParams.get('category') || '';
   const search = searchParams.get('search') || '';
   const minPrice = searchParams.get('minPrice') || 0;
-  const maxPrice = searchParams.get('maxPrice') || 2000;
+  const maxPrice = searchParams.get('maxPrice') || 1000000;
   const sort = searchParams.get('sort') || '';
 
   useEffect(() => {
@@ -24,6 +26,10 @@ const ProductList = () => {
 
   const handleAddToCart = (product, e) => {
     if(e) e.preventDefault();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     dispatch(addToCart(product));
     toast.success(`${product.name} added to cart!`, {
       icon: '🛍️',
@@ -94,7 +100,47 @@ const ProductList = () => {
                   </div>
                 </div>
 
-                {category && (
+                {/* Price Range Filter */}
+                <div className="pt-6 border-t border-slate-100">
+                  <label className="block text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">Price Range</label>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex-1">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                        <input 
+                          type="number" 
+                          placeholder="Min"
+                          value={minPrice || ''}
+                          onChange={(e) => {
+                            const newParams = new URLSearchParams(searchParams);
+                            if (e.target.value) newParams.set('minPrice', e.target.value);
+                            else newParams.delete('minPrice');
+                            setSearchParams(newParams);
+                          }}
+                          className="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                      <span className="text-slate-300 font-bold">-</span>
+                      <div className="relative flex-1">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                        <input 
+                          type="number" 
+                          placeholder="Max"
+                          value={maxPrice === 1000000 && !searchParams.get('maxPrice') ? '' : maxPrice}
+                          onChange={(e) => {
+                            const newParams = new URLSearchParams(searchParams);
+                            if (e.target.value) newParams.set('maxPrice', e.target.value);
+                            else newParams.delete('maxPrice');
+                            setSearchParams(newParams);
+                          }}
+                          className="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {searchParams.toString() !== '' && (
                   <button 
                     onClick={() => setSearchParams({})}
                     className="w-full py-4 text-sm font-bold text-red-500 bg-red-50 hover:bg-red-500 hover:text-white rounded-2xl transition-colors flex items-center justify-center gap-2"
@@ -185,6 +231,10 @@ const ProductList = () => {
                           className="p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm hover:bg-red-50 hover:text-red-500 text-slate-600 transition-colors"
                           onClick={(e) => {
                             e.preventDefault();
+                            if (!isAuthenticated) {
+                              navigate('/login');
+                              return;
+                            }
                             toast('Added to Wishlist!', { icon: '❤️', style: { borderRadius: '16px', background: '#0f172a', color: '#fff', fontWeight: 'bold' } });
                           }}
                         >

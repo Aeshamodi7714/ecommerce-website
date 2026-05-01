@@ -46,4 +46,36 @@ router.get(
   adminController.DashboardStats,
 );
 
+// Toggle Block User
+router.put(
+  "/user/:id/block",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  adminController.toggleBlockUser,
+);
+
+// Get All Reviews
+router.get(
+  "/all/reviews",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  adminController.AllReviews,
+);
+
+// Delete Review
+router.delete(
+  "/review/:id",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  adminController.deleteReview,
+);
+
+// Seed Products
+router.post(
+  "/seed-products",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  adminController.seedProducts,
+);
+
 module.exports = router;

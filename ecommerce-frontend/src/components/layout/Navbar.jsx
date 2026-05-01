@@ -18,8 +18,13 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  
   const catRef = useRef(null);
   const userRef = useRef(null);
+  const searchRef = useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -39,10 +44,46 @@ const Navbar = () => {
     const handler = (e) => {
       if (catRef.current && !catRef.current.contains(e.target)) setShowCategories(false);
       if (userRef.current && !userRef.current.contains(e.target)) setShowUserMenu(false);
+      if (searchRef.current && !searchRef.current.contains(e.target)) setShowAutocomplete(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Live Search Effect
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (searchQuery.trim().length > 1) {
+        setIsSearching(true);
+        try {
+          // Import axiosInstance dynamically or use fetch to avoid adding it to top level if not present
+          const res = await fetch(`http://localhost:5000/api/product/all`);
+          const data = await res.json();
+          if (data && data.product) {
+            const query = searchQuery.toLowerCase();
+            const filtered = data.product.filter(p => 
+              p.name.toLowerCase().includes(query) || 
+              (p.category && p.category.toLowerCase().includes(query)) ||
+              (p.brand && p.brand.toLowerCase().includes(query))
+            ).slice(0, 5); // top 5 results
+            setSearchResults(filtered);
+          }
+        } catch (error) {
+          console.error("Search failed", error);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    };
+    
+    // Simple debounce
+    const timeoutId = setTimeout(() => {
+      fetchSearchResults();
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -127,7 +168,7 @@ const Navbar = () => {
           </div>
 
           {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs xl:max-w-sm">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs xl:max-w-sm relative" ref={searchRef}>
             <div className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
@@ -135,7 +176,11 @@ const Navbar = () => {
                 placeholder="Search products..."
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowAutocomplete(true);
+                }}
+                onFocus={() => setShowAutocomplete(true)}
               />
               {searchQuery && (
                 <button
@@ -146,6 +191,41 @@ const Navbar = () => {
                 </button>
               )}
             </div>
+            
+            {/* Live Search Autocomplete Dropdown */}
+            {showAutocomplete && searchQuery.trim().length > 1 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+                {isSearching ? (
+                  <div className="p-4 text-center text-sm font-bold text-slate-400">Searching...</div>
+                ) : searchResults.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto">
+                    {searchResults.map((product) => (
+                      <Link 
+                        key={product._id} 
+                        to={`/product/${product._id}`}
+                        onClick={() => { setShowAutocomplete(false); setSearchQuery(''); }}
+                        className="flex items-center gap-3 p-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-100 flex items-center justify-center p-1 flex-shrink-0">
+                          <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                          <p className="text-sm font-bold text-slate-900 truncate">{product.name}</p>
+                          <p className="text-xs font-bold text-blue-600">${product.price}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-sm font-bold text-slate-400">No products found</div>
+                )}
+                <div className="bg-slate-50 p-3 text-center border-t border-slate-100">
+                  <button type="submit" className="text-xs font-black text-blue-600 uppercase tracking-widest hover:text-blue-700">
+                    View All Results
+                  </button>
+                </div>
+              </div>
+            )}
           </form>
 
           {/* Right Icons - Desktop */}

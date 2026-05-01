@@ -4,18 +4,32 @@ import { fetchProducts, deleteProduct } from '../../redux/slices/productSlice';
 import { Plus, Edit2, Trash2, ExternalLink, Search, Filter, MoreVertical, Package } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import axiosInstance from '../../services/api/axiosInstance';
+
+import { useState } from 'react';
 
 const AdminProducts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: products, loading } = useSelector((state) => state.products);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
-    console.log('🔄 Fetching products for Admin Panel...');
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    dispatch(fetchProducts({ 
+      search: searchTerm, 
+      category: selectedCategory 
+    }));
+  }, [dispatch, selectedCategory]);
 
-  console.log('📦 Products in Component State:', products);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    dispatch(fetchProducts({ 
+      search: searchTerm, 
+      category: selectedCategory 
+    }));
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
@@ -38,14 +52,75 @@ const AdminProducts = () => {
           <p className="text-slate-500 font-medium">Manage your product listings, stock levels, and pricing.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="bg-white border border-slate-200 px-4 py-2 rounded-2xl flex items-center gap-2">
-            <Search className="h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="Search products..." className="bg-transparent border-none outline-none text-sm font-bold w-48" />
-          </div>
+          <button 
+            onClick={async () => {
+              if (window.confirm('This will reset the database with sample products. Continue?')) {
+                try {
+                  await axiosInstance.post('/admin/seed-products');
+                  dispatch(fetchProducts());
+                  toast.success('Database seeded successfully');
+                } catch (err) {
+                  const msg = err.response?.data?.message || err.message;
+                  toast.error(`Error: ${msg}`);
+                  console.error('Seed Error:', err);
+                }
+              }
+            }}
+            className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all border border-slate-200"
+          >
+            Seed Sample Data
+          </button>
           <Link to="/admin/add-product" className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all">
             <Plus className="h-5 w-5" /> Add Product
           </Link>
         </div>
+      </div>
+
+      {/* ── SEARCH & FILTERS ── */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form onSubmit={handleSearch} className="md:col-span-2 relative group">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+          <input 
+            type="text" 
+            placeholder="Search by name, SKU or brand..." 
+            className="w-full bg-white border-2 border-slate-100 rounded-2xl pl-14 pr-24 py-4 font-bold text-slate-900 focus:outline-none focus:border-blue-500 transition-all shadow-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button 
+            type="submit"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all"
+          >
+            Search
+          </button>
+        </form>
+
+        <div className="relative group">
+          <Filter className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-purple-600 transition-colors" />
+          <select 
+            className="w-full bg-white border-2 border-slate-100 rounded-2xl pl-14 pr-6 py-4 font-bold text-slate-900 focus:outline-none focus:border-purple-500 transition-all shadow-sm appearance-none cursor-pointer"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            <option value="smartphones">Smartphones</option>
+            <option value="laptops">Laptops</option>
+            <option value="audio">Audio</option>
+            <option value="watches">Watches</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+
+        <button 
+          onClick={() => {
+            setSearchTerm('');
+            setSelectedCategory('');
+            dispatch(fetchProducts());
+          }}
+          className="bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 font-bold text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all shadow-sm"
+        >
+          Reset Filters
+        </button>
       </div>
 
       {/* ── PRODUCT TABLE ── */}

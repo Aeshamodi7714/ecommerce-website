@@ -38,12 +38,10 @@ let productSchema = mongoose.Schema(
       unique: true,
       required: true,
     },
-    images: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+    images: {
+      type: [String],
+      required: true,
+    },
     brand: {
       type: String,
       required: true,

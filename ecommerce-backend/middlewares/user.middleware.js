@@ -2,15 +2,23 @@ const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
 module.exports.authUser = async (req, res, next) => {
-  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+  // Prefer Authorization Header (used by frontend bypass) over cookies
+  const authHeader = req.headers.authorization;
+  const token = (authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(" ")[1] : null) || req.cookies?.token;
 
   if (!token) {
-    return res.status(400).json({ message: "Token Exprie Re-SignIn" });
+    return res.status(401).json({ message: "Token Expired or Missing. Please Sign-In." });
   }
 
   if (token === 'admin-auth-token-bypass') {
-    console.log("⚠️ Dev Bypass: Admin Token Used");
-    req.user = await userModel.findOne({ email: 'admin@hub.com' }) || { _id: 'unique_admin_key_1414', role: 'admin', email: 'admin@hub.com' };
+    console.log("⚠️ Dev Bypass: Admin Token Used via Header");
+    // Ensure we provide a full admin object
+    req.user = { 
+      _id: '65f1a2b3c4d5e6f7a8b9c0d0', 
+      role: 'admin', 
+      email: 'admin@hub.com',
+      username: 'Super Admin'
+    };
     return next();
   }
 
@@ -21,6 +29,10 @@ module.exports.authUser = async (req, res, next) => {
 
     if (!user) {
       return res.status(401).json({ message: "Unathorized" });
+    }
+
+    if (user.isBlocked) {
+      return res.status(403).json({ message: "Your account has been blocked. Please contact support." });
     }
 
     req.user = user;

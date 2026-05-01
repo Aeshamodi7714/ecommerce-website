@@ -51,4 +51,8 @@ router.post("/forget-password", userController.forgetPassword)
 // reset password
 router.post("/reset-password/:token", userController.resetPassword)
 
+// Review Routes
+router.post("/review", middleware.authUser, userController.postReview);
+router.get("/reviews/:productId", userController.getProductReviews);
+
 module.exports = router;

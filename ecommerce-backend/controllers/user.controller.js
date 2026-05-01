@@ -47,6 +47,10 @@ module.exports.loginUser = async (req, res) => {
     return res.status(401).json({ message: "Email is invaild" });
   }
 
+  if (checkUser.isBlocked) {
+    return res.status(403).json({ message: "Account is blocked. Please contact admin." });
+  }
+
   const isMatch = await checkUser.comparePassword(password);
 
   if (!isMatch) {
@@ -108,6 +112,41 @@ module.exports.resetPassword = async (req, res) => {
     return res.status(200).json({ message: "Password Reset Successfully " });
   } catch (error) {
     return res.status(400).json({ message: error.message });
+  }
+};
+
+const reviewService = require("../services/review.service");
+
+module.exports.postReview = async (req, res) => {
+  try {
+    const { productId, rating, comment } = req.body;
+    const userId = req.user._id;
+
+    if (!productId || !rating || !comment) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const review = await reviewService.createReview({
+      productId,
+      userId,
+      rating,
+      comment
+    });
+
+    res.status(201).json({ message: "Review posted successfully", review });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.getProductReviews = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const reviews = await reviewService.getAllReviews(); // We can filter here or add a specific service method
+    const productReviews = reviews.filter(r => r.productId?._id.toString() === productId);
+    res.status(200).json({ reviews: productReviews });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
 
