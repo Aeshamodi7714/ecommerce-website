@@ -3,6 +3,7 @@ const router = express.Router();
 const middleware = require("../../../middlewares/admin.middleware");
 const usermiddleware = require("../../../middlewares/user.middleware");
 const adminController = require("../../../controllers/admin.controller");
+const couponController = require("../../../controllers/coupon.controller");
 const { body } = require("express-validator");
 
 // show all users
@@ -77,5 +78,39 @@ router.post(
   middleware.authAdmin,
   adminController.seedProducts,
 );
+
+// Coupon Routes (Admin)
+router.post(
+  "/coupon",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  couponController.createCoupon,
+);
+
+router.get(
+  "/all/coupons",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  couponController.getAllCoupons,
+);
+
+router.delete(
+  "/coupon/:id",
+  usermiddleware.authUser,
+  middleware.authAdmin,
+  couponController.deleteCoupon,
+);
+
+// Banner Routes
+router.get("/banners", usermiddleware.authUser, middleware.authAdmin, adminController.getAllBanners);
+router.post("/banner", usermiddleware.authUser, middleware.authAdmin, adminController.createBanner);
+router.put("/banner/:id", usermiddleware.authUser, middleware.authAdmin, adminController.updateBanner);
+router.delete("/banner/:id", usermiddleware.authUser, middleware.authAdmin, adminController.deleteBanner);
+
+// Ticket Routes
+router.get("/tickets", usermiddleware.authUser, middleware.authAdmin, adminController.getAllTickets);
+router.put("/ticket/:id/status", usermiddleware.authUser, middleware.authAdmin, adminController.updateTicketStatus);
+router.post("/ticket/:id/reply", usermiddleware.authUser, middleware.authAdmin, adminController.replyToTicket);
+router.get("/logs", usermiddleware.authUser, middleware.authAdmin, adminController.getSystemLogs);
 
 module.exports = router;

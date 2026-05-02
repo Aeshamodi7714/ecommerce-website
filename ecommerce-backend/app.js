@@ -13,6 +13,8 @@ const cartRouter = require("./routes/web/v1/cart.route");
 const orderRouter = require("./routes/web/v1/order.route");
 const wishlistRouter = require("./routes/web/v1/wishlist.route");
 
+const path = require("path");
+
 const app = express();
 
 app.use(express.json());
@@ -28,18 +30,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// cors origin --> allow only that website that mention into origin group, ex. backend only res when localhost 3002 send reqest, other than give cors error
-// localhost 3002 --> req --> accept --> give response
-// localhost 3004 --> req --> cors error --> don't give response
-// in origin you mention frontend urls (deveopment, producation both)
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// cors origin
+app.use(cors({ 
+  origin: ["http://localhost:5173", "http://localhost:5000"], 
+  credentials: true 
+}));
 
-PORT = process.env.PORT;
+PORT = process.env.PORT || 5000;
 
-// temp route --> in Backend we Don't create a Home Route. after Teasting / Developement Remove Home Route
-app.get("/", (req, res) => {
-  res.status(401).json({ message: "Access Denined !!" });
-});
+// API routes
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/product", productRouter);
@@ -47,6 +46,18 @@ app.use("/api/bot", chatRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/wishlist", wishlistRouter)
+
+// Serve Frontend Static Files
+const frontendPath = path.join(__dirname, "../ecommerce-frontend/dist");
+app.use(express.static(frontendPath));
+
+// Fallback to index.html for React Router (must be after API routes)
+app.use((req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(404).json({ message: "API endpoint not found" });
+  }
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 
 app.listen(PORT, () => {
   console.log(`✅ server is Running on PORT ${PORT}`);

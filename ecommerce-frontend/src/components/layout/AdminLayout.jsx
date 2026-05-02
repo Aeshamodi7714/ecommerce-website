@@ -14,7 +14,15 @@ import {
   Bell,
   Search,
   Plus,
-  TrendingUp
+  Database,
+  CreditCard,
+  Truck,
+  RotateCcw,
+  Megaphone,
+  ShieldCheck,
+  LifeBuoy,
+  Cpu,
+  History
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice';
@@ -30,11 +38,17 @@ const AdminLayout = () => {
   const menuItems = [
     { title: 'Dashboard', path: '/admin', icon: <LayoutDashboard className="h-5 w-5" /> },
     { title: 'Products', path: '/admin/products', icon: <Package className="h-5 w-5" /> },
+    { title: 'Inventory', path: '/admin/inventory', icon: <Database className="h-5 w-5" /> },
     { title: 'Orders', path: '/admin/orders', icon: <ShoppingBag className="h-5 w-5" /> },
+    { title: 'Payments', path: '/admin/payments', icon: <CreditCard className="h-5 w-5" /> },
+    { title: 'Logistics', path: '/admin/shipping', icon: <Truck className="h-5 w-5" /> },
+    { title: 'Returns', path: '/admin/returns', icon: <RotateCcw className="h-5 w-5" /> },
+    { title: 'Marketing', path: '/admin/marketing', icon: <Megaphone className="h-5 w-5" /> },
     { title: 'Customers', path: '/admin/users', icon: <Users className="h-5 w-5" /> },
-    { title: 'Reviews', path: '/admin/reviews', icon: <Bell className="h-5 w-5" /> },
-    { title: 'Coupons', path: '/admin/coupons', icon: <Zap className="h-5 w-5" /> },
-    { title: 'Reports', path: '/admin/reports', icon: <TrendingUp className="h-5 w-5" /> },
+    { title: 'Support', path: '/admin/support', icon: <LifeBuoy className="h-5 w-5" /> },
+    { title: 'Roles', path: '/admin/roles', icon: <ShieldCheck className="h-5 w-5" /> },
+    { title: 'AI Tools', path: '/admin/ai-tools', icon: <Cpu className="h-5 w-5" /> },
+    { title: 'Logs', path: '/admin/logs', icon: <History className="h-5 w-5" /> },
     { title: 'Settings', path: '/admin/settings', icon: <Settings className="h-5 w-5" /> },
   ];
 

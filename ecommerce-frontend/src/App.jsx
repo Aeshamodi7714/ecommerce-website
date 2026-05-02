@@ -18,6 +18,7 @@ import OrderConfirmation from './pages/cart/OrderConfirmation';
 const Profile = lazy(() => import('./pages/user/Profile'));
 const Orders = lazy(() => import('./pages/user/Orders'));
 const Wishlist = lazy(() => import('./pages/user/Wishlist'));
+const Offers = lazy(() => import('./pages/user/Offers'));
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminLayout from './components/layout/AdminLayout';
 const AdminProducts = lazy(() => import('./pages/admin/Products'));
@@ -29,6 +30,16 @@ const AdminCoupons = lazy(() => import('./pages/admin/Coupons'));
 const AdminReports = lazy(() => import('./pages/admin/Reports'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 const AdminEditProduct = lazy(() => import('./pages/admin/EditProduct'));
+
+const AdminInventory = lazy(() => import('./pages/admin/Inventory'));
+const AdminPayments = lazy(() => import('./pages/admin/Payments'));
+const AdminShipping = lazy(() => import('./pages/admin/Shipping'));
+const AdminReturns = lazy(() => import('./pages/admin/Returns'));
+const AdminMarketing = lazy(() => import('./pages/admin/Marketing'));
+const AdminRoles = lazy(() => import('./pages/admin/Roles'));
+const AdminSupport = lazy(() => import('./pages/admin/Support'));
+const AdminAITools = lazy(() => import('./pages/admin/AITools'));
+const AdminLogs = lazy(() => import('./pages/admin/Logs'));
 
 // Loading component
 const PageLoader = () => (
@@ -46,7 +57,7 @@ const ProtectedRoute = ({ children }) => {
 // Admin Route Component
 const AdminRoute = ({ children }) => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-  return (isAuthenticated && user?.email === 'admin@hub.com') ? children : <Navigate to="/" />;
+  return (isAuthenticated && (user?.email === 'admin@hub.com' || user?.role === 'admin')) ? children : <Navigate to="/" />;
 };
 
 function App() {
@@ -73,6 +84,7 @@ function App() {
             <Route path="order-confirmation" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
             <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+            <Route path="offers" element={<Offers />} />
           </Route>
 
           {/* Admin Routes (Independent of main Layout) */}
@@ -80,11 +92,17 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="add-product" element={<AdminAddProduct />} />
+            <Route path="inventory" element={<AdminInventory />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="payments" element={<AdminPayments />} />
+            <Route path="shipping" element={<AdminShipping />} />
+            <Route path="returns" element={<AdminReturns />} />
+            <Route path="marketing" element={<AdminMarketing />} />
             <Route path="users" element={<AdminUsers />} />
-            <Route path="reviews" element={<AdminReviews />} />
-            <Route path="coupons" element={<AdminCoupons />} />
-            <Route path="reports" element={<AdminReports />} />
+            <Route path="support" element={<AdminSupport />} />
+            <Route path="roles" element={<AdminRoles />} />
+            <Route path="ai-tools" element={<AdminAITools />} />
+            <Route path="logs" element={<AdminLogs />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="edit-product/:id" element={<AdminEditProduct />} />
           </Route>

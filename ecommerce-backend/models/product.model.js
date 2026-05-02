@@ -51,6 +51,18 @@ let productSchema = mongoose.Schema(
       required: true,
       minLength: 3,
     },
+    lowStockThreshold: {
+      type: Number,
+      default: 5,
+    },
+    inventoryHistory: [
+      {
+        date: { type: Date, default: Date.now },
+        change: Number,
+        type: { type: String, enum: ['sale', 'restock', 'return', 'manual'] },
+        note: String
+      }
+    ],
   },
   { timestamps: true },
 );

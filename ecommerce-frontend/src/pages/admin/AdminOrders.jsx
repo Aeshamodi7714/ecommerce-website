@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axiosInstance from '../../services/api/axiosInstance';
-import { Package, Clock, CheckCircle2, ChevronRight, User, ShoppingBag, Search, Filter, X, CreditCard, Calendar, Hash, ChevronDown } from 'lucide-react';
+import { Package, Clock, CheckCircle2, ChevronRight, User, ShoppingBag, Search, Filter, X, CreditCard, Calendar, Hash, ChevronDown, FileText, Printer, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const StatusDropdown = ({ currentStatus, onUpdate }) => {
@@ -61,8 +61,8 @@ const AdminOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axiosInstance.get('/admin/all/orders');
-        setOrders(response.data.orders);
+        const response = await axiosInstance.get('/order/admin/all');
+        setOrders(response.data.orders || []);
       } catch (error) {
         console.error('Failed to fetch orders:', error);
       } finally {
@@ -74,7 +74,7 @@ const AdminOrders = () => {
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      await axiosInstance.put(`/order/${id}`, { status: newStatus });
+      await axiosInstance.put(`/order/status/${id}`, { status: newStatus });
       setOrders(orders.map(o => o._id === id ? { ...o, status: newStatus } : o));
       if (selectedOrder?._id === id) setSelectedOrder({ ...selectedOrder, status: newStatus });
       toast.success(`Order marked as ${newStatus}`, {
@@ -161,7 +161,7 @@ const AdminOrders = () => {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-slate-900">Customer</p>
-                          <p className="text-[10px] font-bold text-slate-400">ID: {order.userId?.slice(-6) || 'Guest'}</p>
+                          <p className="text-[10px] font-bold text-slate-400">ID: {order.userId?._id?.slice(-6) || 'Guest'}</p>
                         </div>
                       </div>
                     </td>
@@ -186,10 +186,19 @@ const AdminOrders = () => {
                       <p className="text-sm font-black text-slate-900">${(order.totalbill || 0).toFixed(2)}</p>
                     </td>
                     <td className="px-8 py-6 text-center">
-                      <StatusDropdown 
-                        currentStatus={order.status} 
-                        onUpdate={(newStatus) => handleStatusUpdate(order._id, newStatus)} 
-                      />
+                      <div className="flex items-center justify-center gap-3">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setSelectedOrder(order); }}
+                          className="p-2.5 bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all shadow-sm"
+                          title="View Invoice"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </button>
+                        <StatusDropdown 
+                          currentStatus={order.status} 
+                          onUpdate={(newStatus) => handleStatusUpdate(order._id, newStatus)} 
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -236,7 +245,7 @@ const AdminOrders = () => {
                     <User className="h-4 w-4" />
                     <span className="text-[10px] font-black uppercase tracking-widest">Customer Info</span>
                   </div>
-                  <p className="font-black text-slate-900">User ID: {selectedOrder.userId?.slice(-8) || 'Guest'}</p>
+                  <p className="font-black text-slate-900">User ID: {selectedOrder.userId?._id?.slice(-8) || 'Guest'}</p>
                   <p className="text-xs font-bold text-slate-500">{selectedOrder.userId ? 'Registered Customer' : 'Guest Checkout'}</p>
                 </div>
 

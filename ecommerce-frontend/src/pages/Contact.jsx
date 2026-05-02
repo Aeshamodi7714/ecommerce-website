@@ -164,7 +164,10 @@ const Contact = () => {
             <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white">
               <h3 className="font-extrabold text-xl mb-2">24/7 Live Chat</h3>
               <p className="text-blue-200 text-sm mb-5">Need instant help? Chat with our support team right away.</p>
-              <button className="w-full py-3 bg-white text-blue-600 font-bold rounded-2xl hover:shadow-lg transition-all flex items-center justify-center gap-2">
+              <button 
+                onClick={() => window.open('https://wa.me/919876543210?text=Hello%20ElectroHub%20Support!%20I%20need%20some%20help.', '_blank')}
+                className="w-full py-3 bg-white text-blue-600 font-bold rounded-2xl hover:shadow-lg transition-all flex items-center justify-center gap-2"
+              >
                 <MessageCircle className="h-5 w-5" /> Start Live Chat
               </button>
             </div>

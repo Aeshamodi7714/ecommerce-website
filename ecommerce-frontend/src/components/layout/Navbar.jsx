@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { ShoppingCart, User, Heart, Search, LogOut, Menu, X, Smartphone, Laptop, Headphones, Watch, Package, ChevronDown, Zap } from 'lucide-react';
+import { ShoppingCart, User, Heart, Search, LogOut, Menu, X, Smartphone, Laptop, Headphones, Watch, Package, ChevronDown, Zap, Tag, Ticket } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { logout } from '../../redux/slices/authSlice';
+import axiosInstance from '../../services/api/axiosInstance';
 
 const categories = [
   { name: 'Smartphones', slug: 'smartphones', icon: Smartphone, color: 'text-blue-500' },
@@ -21,7 +22,7 @@ const Navbar = () => {
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  
+
   const catRef = useRef(null);
   const userRef = useRef(null);
   const searchRef = useRef(null);
@@ -56,16 +57,14 @@ const Navbar = () => {
       if (searchQuery.trim().length > 1) {
         setIsSearching(true);
         try {
-          // Import axiosInstance dynamically or use fetch to avoid adding it to top level if not present
-          const res = await fetch(`http://localhost:5000/api/product/all`);
-          const data = await res.json();
-          if (data && data.product) {
+          const { data } = await axiosInstance.get('/product/all');
+          if (data && data.products) {
             const query = searchQuery.toLowerCase();
-            const filtered = data.product.filter(p => 
-              p.name.toLowerCase().includes(query) || 
+            const filtered = data.products.filter(p =>
+              p.name.toLowerCase().includes(query) ||
               (p.category && p.category.toLowerCase().includes(query)) ||
               (p.brand && p.brand.toLowerCase().includes(query))
-            ).slice(0, 5); // top 5 results
+            ).slice(0, 5);
             setSearchResults(filtered);
           }
         } catch (error) {
@@ -77,7 +76,7 @@ const Navbar = () => {
         setSearchResults([]);
       }
     };
-    
+
     // Simple debounce
     const timeoutId = setTimeout(() => {
       fetchSearchResults();
@@ -165,6 +164,9 @@ const Navbar = () => {
             <Link to="/faq" className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
               FAQs
             </Link>
+            <Link to="/offers" className="flex items-center gap-2 px-4 py-2 text-sm font-black text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-blue-100/50">
+              <Tag className="h-3.5 w-3.5" /> Offers
+            </Link>
           </div>
 
           {/* Search Bar - Desktop */}
@@ -191,7 +193,7 @@ const Navbar = () => {
                 </button>
               )}
             </div>
-            
+
             {/* Live Search Autocomplete Dropdown */}
             {showAutocomplete && searchQuery.trim().length > 1 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
@@ -200,8 +202,8 @@ const Navbar = () => {
                 ) : searchResults.length > 0 ? (
                   <div className="max-h-80 overflow-y-auto">
                     {searchResults.map((product) => (
-                      <Link 
-                        key={product._id} 
+                      <Link
+                        key={product._id}
                         to={`/product/${product._id}`}
                         onClick={() => { setShowAutocomplete(false); setSearchQuery(''); }}
                         className="flex items-center gap-3 p-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors"
@@ -271,6 +273,9 @@ const Navbar = () => {
                     </Link>
                     <Link to="/orders" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors font-medium">
                       <Package className="h-4 w-4" /> My Orders
+                    </Link>
+                    <Link to="/offers" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors font-medium">
+                      <Ticket className="h-4 w-4" /> My Offers
                     </Link>
                     {user?.email === 'admin@hub.com' && (
                       <Link to="/admin" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 font-bold hover:bg-blue-50 transition-colors">
@@ -344,6 +349,7 @@ const Navbar = () => {
             <Link to="/about" onClick={() => setIsOpen(false)} className="py-2.5 px-4 text-sm font-semibold text-slate-600 hover:text-blue-600 rounded-xl hover:bg-slate-50 transition-colors">About Us</Link>
             <Link to="/contact" onClick={() => setIsOpen(false)} className="py-2.5 px-4 text-sm font-semibold text-slate-600 hover:text-blue-600 rounded-xl hover:bg-slate-50 transition-colors">Contact</Link>
             <Link to="/faq" onClick={() => setIsOpen(false)} className="py-2.5 px-4 text-sm font-semibold text-slate-600 hover:text-blue-600 rounded-xl hover:bg-slate-50 transition-colors">FAQs</Link>
+            <Link to="/offers" onClick={() => setIsOpen(false)} className="py-2.5 px-4 text-sm font-black text-blue-600 rounded-xl hover:bg-blue-50 transition-colors flex items-center gap-2"><Tag className="h-4 w-4" /> Offers</Link>
           </div>
 
           <hr className="border-slate-100" />

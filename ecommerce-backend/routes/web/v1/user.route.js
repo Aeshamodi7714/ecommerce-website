@@ -1,12 +1,12 @@
 const express = require("express");
 const { body } = require("express-validator");
 const userController = require("../../../controllers/user.controller");
+const couponController = require("../../../controllers/coupon.controller");
 const middleware = require("../../../middlewares/user.middleware");
 
 const router = express.Router();
 
 // register user
-// second validation -- use express validator package
 router.post(
   "/register",
   [
@@ -54,5 +54,15 @@ router.post("/reset-password/:token", userController.resetPassword)
 // Review Routes
 router.post("/review", middleware.authUser, userController.postReview);
 router.get("/reviews/:productId", userController.getProductReviews);
+
+// Coupon Routes (User)
+router.post("/coupon/validate", middleware.authUser, couponController.validateCoupon);
+router.get("/coupons/active", middleware.authUser, couponController.getAllCoupons);
+
+const adminMiddleware = require("../../../middlewares/admin.middleware");
+
+// Admin Management Routes
+router.get("/admin/all", middleware.authUser, adminMiddleware.authAdmin, userController.getAllAdmins);
+router.put("/permissions/:id", middleware.authUser, adminMiddleware.authAdmin, userController.updateAdminPermissions);
 
 module.exports = router;

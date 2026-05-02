@@ -43,10 +43,12 @@ module.exports.GetOrder = async(userId)=>{
 
 // get all orders (Admin)
 module.exports.GetAllOrders = async () => {
-    return await orderModel.find({});
+    return await orderModel.find({}).populate('userId', 'username email').sort({ createdAt: -1 });
 }
 
 // update status (Admin)
-module.exports.UpdateOrderStatus = async (orderId, status) => {
-    return await orderModel.findByIdAndUpdate(orderId, { status }, { new: true });
+module.exports.UpdateOrderStatus = async (orderId, updateData) => {
+    // If updateData is just a string, convert to object
+    const update = typeof updateData === 'string' ? { status: updateData } : updateData;
+    return await orderModel.findByIdAndUpdate(orderId, { $set: update }, { new: true }).populate('userId', 'username email');
 }

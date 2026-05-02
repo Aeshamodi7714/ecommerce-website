@@ -205,3 +205,125 @@ module.exports.toggleBlockUser = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
+
+const bannerModel = require("../models/banner.model");
+
+// Banner Management
+module.exports.getAllBanners = async (req, res) => {
+  try {
+    let banners = await bannerModel.find();
+    
+    if (!banners || banners.length === 0) {
+      const samples = [
+        { title: "Summer Tech Sale", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800", link: "/products" },
+        { title: "New iPhone Launch", image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800", link: "/products", isActive: false }
+      ];
+      await bannerModel.insertMany(samples);
+      banners = await bannerModel.find();
+    }
+    
+    res.status(200).json({ banners });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.updateBanner = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const banner = await bannerModel.findByIdAndUpdate(id, req.body, { new: true });
+    res.status(200).json({ message: "Banner updated", banner });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.createBanner = async (req, res) => {
+  try {
+    const banner = await bannerModel.create(req.body);
+    res.status(200).json({ message: "Banner created", banner });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.deleteBanner = async (req, res) => {
+  try {
+    await bannerModel.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Banner deleted" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const ticketModel = require("../models/ticket.model");
+
+// Ticket Management
+module.exports.getAllTickets = async (req, res) => {
+  try {
+    let tickets = await ticketModel.find().populate('userId', 'username email');
+    
+    if (!tickets || tickets.length === 0) {
+      const user = await userModel.findOne({ role: 'admin' });
+      if (user) {
+        const samples = [
+          { userId: user._id, subject: "Refund delay EH992", message: "My refund for order EH992 is still pending after 5 days.", priority: 'high' },
+          { userId: user._id, subject: "Login Issue", message: "I am unable to login with my mobile number.", priority: 'medium' }
+        ];
+        await ticketModel.insertMany(samples);
+        tickets = await ticketModel.find().populate('userId', 'username email');
+      }
+    }
+    
+    res.status(200).json({ tickets });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.updateTicketStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const ticket = await ticketModel.findByIdAndUpdate(id, { status }, { new: true });
+    res.status(200).json({ message: "Ticket status updated", ticket });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.replyToTicket = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+    const ticket = await ticketModel.findById(id);
+    ticket.responses.push({ sender: 'admin', message });
+    await ticket.save();
+    res.status(200).json({ message: "Reply sent", ticket });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const logModel = require("../models/log.model");
+
+// Log Management
+module.exports.getSystemLogs = async (req, res) => {
+  try {
+    let logs = await logModel.find().sort({ createdAt: -1 }).limit(50);
+    
+    if (!logs || logs.length === 0) {
+      const samples = [
+        { eventType: 'security', adminEmail: 'admin@hub.com', action: 'Admin Login Successful', ipAddress: '192.168.1.1' },
+        { eventType: 'inventory', adminEmail: 'manager@hub.com', action: 'Stock Update: iPhone 15', ipAddress: '192.168.1.42' },
+        { eventType: 'finance', adminEmail: 'admin@hub.com', action: 'Refund Processed: #ORD-992', ipAddress: '192.168.1.1' }
+      ];
+      await logModel.insertMany(samples);
+      logs = await logModel.find().sort({ createdAt: -1 });
+    }
+    
+    res.status(200).json({ logs });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};

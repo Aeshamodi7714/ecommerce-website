@@ -84,33 +84,15 @@ module.exports.AllProduct = async (query = {}) => {
 };
 
 // update product
-module.exports.updateProduct = async ({
-  productId,
-  name,
-  description,
-  stock,
-  price,
-  discount,
-  isNewproduct,
-  sku,
-  images,
-  brand,
-  category,
-}) => {
+module.exports.updateProduct = async (updateData) => {
+  const { productId, ...fields } = updateData;
+  
+  // Remove undefined fields
+  Object.keys(fields).forEach(key => fields[key] === undefined && delete fields[key]);
+
   const updatedProduct = await productModel.findOneAndUpdate(
     { _id: productId },
-    {
-      name,
-      description,
-      stock,
-      price,
-      discount,
-      isNewproduct,
-      sku,
-      images,
-      brand,
-      category,
-    },
+    { $set: fields },
     { new: true },
   );
 

@@ -40,13 +40,25 @@ body {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .animate-fade-in {
@@ -65,28 +77,38 @@ body {
   0% { transform: translateY(0); }
   100% { transform: translateY(192px); }
 }
+
 @keyframes tilt {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(10deg); }
 }
+
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
 @keyframes progress {
   0% { width: 0; }
   100% { width: 100%; }
 }
 
-.animate-scan {
-  animation: scan 2s linear infinite;
+.animate-scan { animation: scan 2s linear infinite; }
+.animate-tilt { animation: tilt 2s ease-in-out infinite; }
+.animate-shimmer { animation: shimmer 1.5s infinite; }
+.animate-progress { animation: progress 5s linear forwards; }
+
+/* Custom Scrollbar Utility */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
 }
-.animate-tilt {
-  animation: tilt 2s ease-in-out infinite;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
-.animate-shimmer {
-  animation: shimmer 1.5s infinite;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
 }
-.animate-progress {
-  animation: progress 5s linear forwards;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
 }

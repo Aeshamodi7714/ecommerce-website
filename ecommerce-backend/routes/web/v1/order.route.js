@@ -11,7 +11,10 @@ router.post("/add", userMiddleware.authUser, orderController.CreateOrder)
 router.get("/all", userMiddleware.authUser, orderController.GetOrder)
 
 // update order status (Admin Only)
-router.put("/:id", userMiddleware.authUser, adminMiddleware.authAdmin, orderController.UpdateOrderStatus)
+router.put("/status/:id", userMiddleware.authUser, adminMiddleware.authAdmin, orderController.UpdateOrderStatus)
+
+// get all orders (Admin Only)
+router.get("/admin/all", userMiddleware.authUser, adminMiddleware.authAdmin, orderController.GetAllOrdersAdmin)
 
 
 

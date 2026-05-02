@@ -162,3 +162,35 @@ module.exports.changePassword = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
+
+module.exports.getAllAdmins = async (req, res) => {
+  try {
+    let admins = await userModel.find({ role: 'admin' });
+    
+    // Seed some staff admins if only one exists
+    if (admins.length <= 1) {
+      const samples = [
+        { username: 'Support Staff', email: 'support@hub.com', password: 'password123', role: 'admin', permissions: ['support', 'orders'] },
+        { username: 'Inventory Manager', email: 'manager@hub.com', password: 'password123', role: 'admin', permissions: ['inventory', 'products'] }
+      ];
+      // Note: In a real app we'd hash passwords, but this is for dev testing
+      await userModel.insertMany(samples);
+      admins = await userModel.find({ role: 'admin' });
+    }
+    
+    res.status(200).json({ admins });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports.updateAdminPermissions = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { permissions } = req.body;
+    const admin = await userModel.findByIdAndUpdate(id, { permissions }, { new: true });
+    res.status(200).json({ message: "Permissions updated", admin });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};

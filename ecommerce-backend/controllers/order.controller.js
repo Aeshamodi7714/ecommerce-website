@@ -39,16 +39,27 @@ module.exports.GetOrder = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
+
 // update order status (Admin)
 module.exports.UpdateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    const order = await orderService.UpdateOrderStatus(id, status);
+    const updateData = req.body;
+    const order = await orderService.UpdateOrderStatus(id, updateData);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
     return res.status(200).json({ message: "Order Status Updated", order });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+// Get All Orders for Admin
+module.exports.GetAllOrdersAdmin = async (req, res) => {
+  try {
+    const orders = await orderService.GetAllOrders();
+    return res.status(200).json({ message: "Orders Fetched Successfully", orders });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }

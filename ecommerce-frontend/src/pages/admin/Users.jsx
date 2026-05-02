@@ -63,7 +63,7 @@ const Users = () => {
     try {
       const [usersRes, ordersRes] = await Promise.all([
         axiosInstance.get('/admin/all/user'),
-        axiosInstance.get('/admin/all/orders')
+        axiosInstance.get('/order/admin/all')
       ]);
       setUsers(usersRes.data.users || []);
       setOrders(ordersRes.data.orders || []);
@@ -103,7 +103,7 @@ const Users = () => {
   };
 
   const getUserOrderCount = (userId) => {
-    return orders.filter(order => order.userId === userId).length;
+    return orders.filter(order => (order.userId?._id || order.userId) === userId).length;
   };
 
   const filteredUsers = users.filter(u => 

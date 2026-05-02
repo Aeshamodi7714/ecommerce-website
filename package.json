@@ -1,0 +1,15 @@
+{
+  "name": "ecommerce-hub",
+  "version": "1.0.0",
+  "scripts": {
+    "install-all": "npm install && cd ecommerce-frontend && npm install && cd ../ecommerce-backend && npm install",
+    "dev": "concurrently \"npm run dev-backend\" \"npm run dev-frontend\"",
+    "dev-backend": "cd ecommerce-backend && npm run dev",
+    "dev-frontend": "cd ecommerce-frontend && npm run dev",
+    "build": "cd ecommerce-frontend && npm run build",
+    "start": "cd ecommerce-backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
